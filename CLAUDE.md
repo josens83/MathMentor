@@ -601,3 +601,74 @@ import { WebVitals } from "@/components/analytics/WebVitals";
 - [ ] 데이터 로딩 시 Skeleton UI 표시
 - [ ] Server Components 우선 사용
 - [ ] `npm run analyze`로 번들 크기 확인
+
+---
+
+## 🎨 디자인 시스템
+
+### 디자인 토큰
+
+CSS 변수 기반 디자인 토큰 시스템 (`src/styles/tokens/`):
+
+```css
+/* 색상 사용 */
+color: var(--color-text-primary);
+background: var(--color-bg-secondary);
+border-color: var(--color-border-primary);
+
+/* 게이미피케이션 색상 */
+--color-xp: #10B981;
+--color-energy: #F59E0B;
+--color-streak: #F43F5E;
+--color-gems: #06B6D4;
+```
+
+### 다크모드
+
+```tsx
+// ThemeProvider 사용
+import { ThemeProvider, useTheme } from "@/components/theme";
+
+// layout.tsx
+<ThemeProvider>
+  {children}
+</ThemeProvider>
+
+// 컴포넌트에서
+const { theme, setTheme, resolvedTheme } = useTheme();
+```
+
+### UI 컴포넌트
+
+| 컴포넌트 | 용도 |
+|----------|------|
+| `GlassCard` | 글래스모피즘 카드 |
+| `AnimatedButton` | 마이크로인터랙션 버튼 |
+| `ThemeToggle` | 테마 전환 UI |
+| `SkipLink` | 키보드 네비게이션 |
+
+### 접근성 (WCAG 2.1 AA)
+
+```typescript
+import {
+  getContrastRatio,
+  meetsWCAG,
+  announceToScreenReader
+} from "@/lib/accessibility";
+
+// 색상 대비 확인
+const ratio = getContrastRatio("#333", "#FFF"); // 12.63
+const isValid = meetsWCAG("#333", "#FFF", "AA"); // true
+
+// 스크린 리더 알림
+announceToScreenReader("저장되었습니다");
+```
+
+### 접근성 체크리스트
+
+- [ ] 색상 대비 4.5:1 이상 (일반 텍스트)
+- [ ] 모든 이미지에 alt 텍스트
+- [ ] 키보드로 모든 기능 사용 가능
+- [ ] 포커스 상태 명확히 표시
+- [ ] SkipLink 제공
+- [ ] `prefers-reduced-motion` 존중

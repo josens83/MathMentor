@@ -1,0 +1,81 @@
+/* ===========================================
+   MathMentor Design Tokens - Typography
+   =========================================== */
+
+:root {
+  /* ===== Font Family ===== */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-math: "KaTeX_Main", "Times New Roman", serif;
+
+  /* ===== Font Size ===== */
+  --font-size-xs: 0.75rem; /* 12px */
+  --font-size-sm: 0.875rem; /* 14px */
+  --font-size-base: 1rem; /* 16px */
+  --font-size-lg: 1.125rem; /* 18px */
+  --font-size-xl: 1.25rem; /* 20px */
+  --font-size-2xl: 1.5rem; /* 24px */
+  --font-size-3xl: 1.875rem; /* 30px */
+  --font-size-4xl: 2.25rem; /* 36px */
+  --font-size-5xl: 3rem; /* 48px */
+  --font-size-6xl: 3.75rem; /* 60px */
+
+  /* ===== Font Weight ===== */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ===== Line Height ===== */
+  --line-height-none: 1;
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* ===== Letter Spacing ===== */
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+
+  /* ===== Semantic Typography ===== */
+
+  /* Body */
+  --font-size-body: var(--font-size-base);
+  --font-size-body-sm: var(--font-size-sm);
+  --font-size-body-lg: var(--font-size-lg);
+
+  /* Headings */
+  --font-size-h1: var(--font-size-4xl);
+  --font-size-h2: var(--font-size-3xl);
+  --font-size-h3: var(--font-size-2xl);
+  --font-size-h4: var(--font-size-xl);
+  --font-size-h5: var(--font-size-lg);
+  --font-size-h6: var(--font-size-base);
+
+  /* UI Elements */
+  --font-size-button: var(--font-size-sm);
+  --font-size-button-lg: var(--font-size-base);
+  --font-size-label: var(--font-size-sm);
+  --font-size-caption: var(--font-size-xs);
+  --font-size-badge: var(--font-size-xs);
+}
+
+/* Responsive typography adjustments */
+@media (min-width: 768px) {
+  :root {
+    --font-size-h1: var(--font-size-5xl);
+    --font-size-h2: var(--font-size-4xl);
+    --font-size-h3: var(--font-size-3xl);
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --font-size-h1: var(--font-size-6xl);
+    --font-size-h2: var(--font-size-5xl);
+  }
+}
