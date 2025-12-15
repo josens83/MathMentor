@@ -338,3 +338,185 @@ npm run build      # 빌드 성공
 | `src/types/database.ts` | Supabase 타입 정의 |
 | `src/middleware.ts` | 인증 미들웨어 |
 | `supabase/schema.sql` | 데이터베이스 스키마 |
+
+---
+
+## 🧠 Extended Thinking (심층 사고)
+
+복잡한 작업에는 Extended Thinking 트리거를 사용하여 더 깊은 분석을 요청할 수 있습니다.
+
+### 트리거 레벨
+
+| 레벨 | 트리거 | 사용 상황 | 예산 |
+|------|--------|-----------|------|
+| 기본 | (없음) | 단순 CRUD, UI 수정, 버그 수정 | - |
+| 낮음 | "think" | API 설계, 상태 관리, 컴포넌트 구조 | ~10K tokens |
+| 중간 | "think hard" | AI 통합, 복잡한 비즈니스 로직 | ~30K tokens |
+| 높음 | "think harder" | 아키텍처 설계, 성능 최적화 | ~60K tokens |
+| 최고 | "ultrathink" | 시스템 전체 리팩토링, 마이그레이션 | ~120K tokens |
+
+### 사용 예시
+
+```
+# 기본 (트리거 없음)
+"LoginForm 컴포넌트의 버튼 색상을 파란색으로 변경해줘"
+
+# think
+"think - AI 힌트 API의 요청/응답 스키마를 설계해줘"
+
+# think hard
+"think hard - 실시간 문제 풀이 협업 기능의 상태 관리 구조를 설계해줘"
+
+# ultrathink
+"ultrathink - MathMentor의 전체 인증 시스템을 Supabase Auth에서
+ 커스텀 JWT 기반으로 마이그레이션하는 계획을 수립해줘"
+```
+
+### 트리거 선택 기준
+
+1. **영향 범위**: 변경이 미치는 파일/모듈 수
+2. **복잡도**: 고려해야 할 엣지 케이스 수
+3. **위험도**: 실수 시 발생할 수 있는 문제의 심각성
+4. **가역성**: 변경을 되돌리기 어려운 정도
+
+---
+
+## 🔄 4단계 개발 워크플로우
+
+MathMentor 개발 시 권장하는 체계적인 접근 방식입니다.
+
+### 1️⃣ Explore (탐색)
+
+코드베이스를 먼저 이해합니다.
+
+```bash
+# 세션 시작
+./scripts/start-session.sh
+
+# 관련 파일 탐색
+# - Glob: 파일 패턴 검색
+# - Grep: 코드 내용 검색
+# - Read: 파일 내용 확인
+```
+
+**체크리스트**:
+- [ ] 관련 기존 코드 파악
+- [ ] 의존성 확인
+- [ ] 유사 기능 구현 패턴 확인
+
+### 2️⃣ Plan (계획)
+
+구현 전략을 수립합니다.
+
+**CRISPE 프레임워크 적용**:
+- **C**ontext: 현재 상황과 배경
+- **R**ole: 역할 정의
+- **I**ntent: 달성하려는 목표
+- **S**pecifics: 세부 요구사항
+- **P**ersonality: 코드 스타일
+- **E**xperiment: 검증 방법
+
+**프롬프트 템플릿**: `.claude/prompts/` 디렉토리 참조
+
+### 3️⃣ Code (구현)
+
+Vertical Slice 방식으로 구현합니다.
+
+**Vertical Slice란?**
+- 한 기능의 전체 스택을 한 번에 구현
+- UI → API → DB까지 완전히 동작하는 최소 단위
+
+**구현 순서**:
+1. 타입/스키마 정의
+2. API 라우트 구현
+3. UI 컴포넌트 구현
+4. 통합 테스트
+
+**Iteration**:
+```
+작은 변경 → 테스트 → 커밋 → 반복
+```
+
+### 4️⃣ Commit (커밋)
+
+변경사항을 검증하고 커밋합니다.
+
+```bash
+# Vertical Slice 검증
+./scripts/verify-slice.sh
+
+# 커밋
+git add .
+git commit -m "feat: [기능 설명]"
+```
+
+**검증 체크리스트**:
+- [ ] `npm run typecheck` 통과
+- [ ] `npm run test` 통과
+- [ ] `npm run lint` 통과
+- [ ] `npm run build` 성공
+
+---
+
+## 📋 프롬프트 템플릿
+
+`.claude/prompts/` 디렉토리에 상황별 템플릿이 준비되어 있습니다.
+
+| 파일 | 용도 |
+|------|------|
+| `feature-request.md` | 새 기능 요청 |
+| `bug-fix.md` | 버그 수정 |
+| `code-review.md` | 코드 리뷰 |
+| `refactoring.md` | 리팩토링 |
+
+### 사용법
+
+1. 해당 템플릿 파일 참조
+2. CRISPE 섹션 채우기
+3. 복잡도에 따라 Extended Thinking 트리거 추가
+
+---
+
+## 🛠 개발 스크립트
+
+`scripts/` 디렉토리의 자동화 스크립트:
+
+| 스크립트 | 용도 |
+|----------|------|
+| `start-session.sh` | 개발 세션 시작, 환경 검증 |
+| `verify-slice.sh` | Vertical Slice 검증 |
+
+### 실행 방법
+
+```bash
+# 실행 권한 부여 (최초 1회)
+chmod +x scripts/*.sh
+
+# 세션 시작
+./scripts/start-session.sh
+
+# Slice 검증
+./scripts/verify-slice.sh
+```
+
+---
+
+## 🎯 MathMentor 특화 가이드
+
+### AI 튜터링 기능 개발 시
+
+1. **프롬프트 안전성**: 사용자 입력이 AI 프롬프트에 주입되지 않도록 검증
+2. **응답 스트리밍**: 긴 응답은 스트리밍으로 처리
+3. **폴백 처리**: AI 서비스 장애 시 graceful degradation
+
+### 게이미피케이션 기능 개발 시
+
+1. **XP 계산**: `src/lib/constants.ts`의 `XP_CONFIG` 참조
+2. **레벨 공식**: `xpForLevel(n) = (n-1)² × 100`
+3. **에너지 시스템**: 최대 5, 30분마다 1 회복
+
+### 수학 렌더링 기능 개발 시
+
+1. **KaTeX 에러 핸들링**: 잘못된 LaTeX도 graceful하게 처리
+2. **디스플레이 모드**: 블록 수식은 `displayMode: true`
+3. **모바일 최적화**: 긴 수식은 스크롤 가능하게
