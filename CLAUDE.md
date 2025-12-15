@@ -672,3 +672,261 @@ announceToScreenReader("저장되었습니다");
 - [ ] 포커스 상태 명확히 표시
 - [ ] SkipLink 제공
 - [ ] `prefers-reduced-motion` 존중
+
+---
+
+## 🛡️ 보안 가이드 (OWASP Top 10)
+
+### 보안 모듈 사용
+
+```typescript
+import {
+  // XSS 방지
+  escapeHtml,
+  sanitizeHtml,
+  sanitizeInput,
+  sanitizeUrl,
+
+  // 인증/권한
+  requireAuth,
+  requireRole,
+  hasPermission,
+
+  // 환경 변수
+  env,
+  validateEnv,
+
+  // CSRF 보호
+  csrfMiddleware,
+  getCSRFProps,
+} from "@/lib/security";
+```
+
+### A01: 접근 제어 (Broken Access Control)
+
+```typescript
+// ✅ RBAC 미들웨어 사용
+export const POST = requireRole(['admin', 'tutor'])(async (request, auth) => {
+  // auth.role, auth.permissions 자동 검증됨
+  return NextResponse.json({ success: true });
+});
+
+// ✅ 권한 기반 접근 제어
+export const GET = requireAuth(async (request, auth) => {
+  if (!hasPermission(auth, 'read:solutions')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  // ...
+});
+```
+
+**역할 (Role) 계층**:
+| 역할 | 권한 |
+|------|------|
+| `guest` | `read:problems` |
+| `user` | + `solve:problems`, `read:hints` |
+| `premium` | + `read:solutions`, `use:ai_tutor`, `unlimited:energy` |
+| `tutor` | + `create:problems`, `view:analytics` |
+| `admin` | + `manage:users`, `manage:content`, `manage:billing` |
+
+### A03: 인젝션 (Injection / XSS)
+
+```typescript
+// ✅ HTML 이스케이프 (XSS 방지)
+import { escapeHtml, sanitizeHtml } from "@/lib/security";
+
+const safe = escapeHtml(userInput);
+// '<script>' → '&lt;script&gt;'
+
+// ✅ HTML 콘텐츠 정제 (허용 태그만)
+const cleanHtml = sanitizeHtml(richTextContent);
+// 스크립트, 이벤트 핸들러 제거
+
+// ✅ URL 검증
+import { sanitizeUrl } from "@/lib/security";
+const safeUrl = sanitizeUrl(userProvidedUrl);
+// 'javascript:' → null
+
+// ✅ 파일명 정제 (Path Traversal 방지)
+import { sanitizeFilename } from "@/lib/security";
+sanitizeFilename('../../../etc/passwd'); // 'etc_passwd'
+```
+
+### A07: 환경 변수 검증
+
+```typescript
+// ✅ 시작 시 환경 변수 검증
+import { validateEnv, env } from "@/lib/security";
+
+// app/layout.tsx 또는 instrumentation.ts에서
+validateEnv(); // 누락/잘못된 변수 시 에러
+
+// ✅ 타입 안전한 환경 변수 접근
+const apiKey = env.ANTHROPIC_API_KEY; // 타입: string
+const url = env.NEXT_PUBLIC_SUPABASE_URL; // 타입: string
+```
+
+**환경 변수 검증 규칙**:
+- `ANTHROPIC_API_KEY`: `sk-ant-`로 시작
+- `STRIPE_SECRET_KEY`: `sk_`로 시작
+- `STRIPE_WEBHOOK_SECRET`: `whsec_`로 시작
+- `SUPABASE_*_KEY`: 유효한 JWT 형식
+
+### CSRF 보호
+
+```tsx
+// ✅ Server Component에서 토큰 생성
+import { getCSRFProps } from "@/lib/security";
+
+export default async function Page() {
+  const { token } = await getCSRFProps();
+  return <ContactForm csrfToken={token} />;
+}
+
+// ✅ 폼에서 토큰 포함
+<form action="/api/contact" method="POST">
+  <input type="hidden" name="csrf_token" value={csrfToken} />
+  {/* ... */}
+</form>
+
+// ✅ API 라우트에서 검증
+export const POST = csrfMiddleware(async (request) => {
+  // CSRF 토큰 자동 검증됨
+  return NextResponse.json({ success: true });
+});
+```
+
+### Rate Limiting
+
+```typescript
+import { checkRateLimit, withRateLimit } from "@/lib/security";
+
+// ✅ 수동 체크
+const { allowed, remaining, resetTime } = checkRateLimit(userId, {
+  windowMs: 60000,  // 1분
+  maxRequests: 10,  // 최대 10회
+});
+
+// ✅ 미들웨어로 적용
+export const POST = withRateLimit(
+  { windowMs: 60000, maxRequests: 10 },
+  async (request, auth) => {
+    // Rate limit + 인증 자동 검증
+    return NextResponse.json({ success: true });
+  }
+);
+```
+
+### 입력 검증 (Zod)
+
+```typescript
+import { z } from "zod";
+import { sanitizeInput } from "@/lib/security";
+
+// ✅ 스키마 정의
+const commentSchema = z.object({
+  content: z
+    .string()
+    .min(1)
+    .max(1000)
+    .transform(sanitizeInput), // 자동 정제
+  problemId: z.string().uuid(),
+});
+
+// ✅ API에서 사용
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const result = commentSchema.safeParse(body);
+
+  if (!result.success) {
+    return NextResponse.json(
+      { error: result.error.flatten() },
+      { status: 400 }
+    );
+  }
+
+  // result.data는 타입 안전 + 정제됨
+}
+```
+
+### 보안 체크리스트
+
+**API 라우트**:
+- [ ] 모든 POST/PUT/DELETE에 인증 필수
+- [ ] 민감한 작업에 RBAC 적용
+- [ ] 사용자 입력 Zod로 검증
+- [ ] Rate limiting 적용
+- [ ] CSRF 토큰 검증
+
+**데이터 처리**:
+- [ ] HTML 출력 시 `escapeHtml` 사용
+- [ ] 사용자 제공 URL은 `sanitizeUrl` 검증
+- [ ] 파일 업로드 시 `sanitizeFilename` 적용
+- [ ] JSON 출력 시 `safeJsonStringify` 사용
+
+**환경 설정**:
+- [ ] 프로덕션 전 `validateEnv()` 호출
+- [ ] 민감한 로그 `maskSensitive()` 처리
+- [ ] 서버 전용 키 클라이언트 노출 금지
+
+---
+
+## 🧪 테스트 피라미드
+
+### 테스트 비율
+
+| 유형 | 비율 | 대상 |
+|------|------|------|
+| **Unit** | 70% | 유틸리티, 훅, 순수 함수 |
+| **Integration** | 20% | API 라우트, 컴포넌트 통합 |
+| **E2E** | 10% | 핵심 사용자 플로우 |
+
+### 테스트 명령어
+
+```bash
+npm run test           # 전체 테스트 실행
+npm run test:ui        # UI 모드 (브라우저)
+npm run test:cov       # 커버리지 리포트
+npm run test:watch     # 감시 모드
+```
+
+### 보안 테스트 예시
+
+```typescript
+describe('Security: XSS Prevention', () => {
+  it('should escape HTML in user input', () => {
+    const malicious = '<script>alert("xss")</script>';
+    const safe = escapeHtml(malicious);
+    expect(safe).not.toContain('<script>');
+    expect(safe).toContain('&lt;script&gt;');
+  });
+
+  it('should reject javascript: URLs', () => {
+    const result = sanitizeUrl('javascript:alert(1)');
+    expect(result).toBeNull();
+  });
+});
+
+describe('Security: Auth Middleware', () => {
+  it('should reject unauthenticated requests', async () => {
+    const handler = requireAuth(async () => NextResponse.json({}));
+    const response = await handler(mockRequest);
+    expect(response.status).toBe(401);
+  });
+
+  it('should reject insufficient permissions', async () => {
+    const handler = requireRole(['admin'])(async () => NextResponse.json({}));
+    const response = await handler(mockUserRequest); // role: 'user'
+    expect(response.status).toBe(403);
+  });
+});
+```
+
+### 커버리지 목표
+
+| 영역 | 목표 |
+|------|------|
+| 전체 | 80%+ |
+| 보안 모듈 | 95%+ |
+| 비즈니스 로직 | 90%+ |
+| UI 컴포넌트 | 70%+ |
