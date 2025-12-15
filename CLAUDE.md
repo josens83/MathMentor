@@ -520,3 +520,84 @@ chmod +x scripts/*.sh
 1. **KaTeX 에러 핸들링**: 잘못된 LaTeX도 graceful하게 처리
 2. **디스플레이 모드**: 블록 수식은 `displayMode: true`
 3. **모바일 최적화**: 긴 수식은 스크롤 가능하게
+
+---
+
+## ⚡ 성능 최적화 가이드
+
+### Core Web Vitals 목표
+
+| 메트릭 | 목표 | 측정 대상 |
+|--------|------|----------|
+| **LCP** | < 2.5초 | 가장 큰 콘텐츠 렌더링 |
+| **INP** | < 200ms | 상호작용 반응성 |
+| **CLS** | < 0.1 | 레이아웃 안정성 |
+
+### 성능 측정 명령어
+
+```bash
+npm run analyze          # 번들 크기 분석
+npm run build            # 프로덕션 빌드 + 성능 체크
+```
+
+### LCP 최적화
+
+```tsx
+// ✅ 히어로 이미지에 priority 사용
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
+
+<OptimizedImage
+  src="/hero.webp"
+  alt="Hero"
+  priority              // LCP 이미지는 필수
+  aspectRatio="21/9"
+/>
+```
+
+### INP 최적화
+
+```typescript
+// ✅ Long Task 방지 - 청크 처리
+import { processInChunks } from "@/lib/performance";
+
+const results = await processInChunks(
+  largeArray,
+  item => heavyComputation(item),
+  { chunkSize: 50, onProgress: setProgress }
+);
+```
+
+### CLS 최적화
+
+```tsx
+// ✅ Skeleton으로 공간 확보
+import { CardSkeleton } from "@/components/ui/Skeleton";
+
+{isLoading ? (
+  <CardSkeleton />
+) : (
+  <ProductCard product={product} />
+)}
+```
+
+### 성능 모니터링
+
+```tsx
+// app/layout.tsx에 추가
+import { WebVitals } from "@/components/analytics/WebVitals";
+
+<WebVitals
+  debug={process.env.NODE_ENV === "development"}
+  onReport={(metric) => sendToAnalytics(metric)}
+/>
+```
+
+### 성능 체크리스트
+
+- [ ] LCP 이미지에 `priority` 적용
+- [ ] 모든 이미지에 `aspectRatio` 또는 크기 명시
+- [ ] 긴 목록은 가상화 적용
+- [ ] 무거운 계산은 `processInChunks` 사용
+- [ ] 데이터 로딩 시 Skeleton UI 표시
+- [ ] Server Components 우선 사용
+- [ ] `npm run analyze`로 번들 크기 확인
