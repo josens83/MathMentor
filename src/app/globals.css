@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+/* KaTeX styles will be imported when package is installed */
+
+@theme inline {
+  /* Primary - 파란색 (수학/논리적 느낌) */
+  --color-primary: oklch(0.6 0.2 240);
+  --color-primary-foreground: oklch(1 0 0);
+
+  /* Secondary - 보라색 (Pro 기능) */
+  --color-secondary: oklch(0.55 0.25 280);
+  --color-secondary-foreground: oklch(1 0 0);
+
+  /* Accent - 골드 (XP, Gems) */
+  --color-accent: oklch(0.75 0.18 85);
+  --color-accent-foreground: oklch(0.2 0 0);
+
+  /* Success - 정답 */
+  --color-success: oklch(0.55 0.2 145);
+  --color-success-foreground: oklch(1 0 0);
+
+  /* Warning - 경고 */
+  --color-warning: oklch(0.75 0.15 60);
+  --color-warning-foreground: oklch(0.2 0 0);
+
+  /* Destructive - 오답 */
+  --color-destructive: oklch(0.55 0.25 25);
+  --color-destructive-foreground: oklch(1 0 0);
+
+  /* Background & Foreground */
+  --color-background: oklch(0.99 0 0);
+  --color-foreground: oklch(0.15 0 0);
+
+  /* Muted */
+  --color-muted: oklch(0.96 0.005 260);
+  --color-muted-foreground: oklch(0.5 0.01 260);
+
+  /* Card */
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.15 0 0);
+
+  /* Border & Input */
+  --color-border: oklch(0.9 0.01 260);
+  --color-input: oklch(0.9 0.01 260);
+  --color-ring: oklch(0.6 0.2 240);
+
+  /* Radius */
+  --radius: 0.75rem;
+
+  /* XP Bar Colors */
+  --color-xp-start: oklch(0.6 0.25 280);
+  --color-xp-end: oklch(0.65 0.2 240);
+
+  /* Energy Bar */
+  --color-energy: oklch(0.65 0.2 145);
+
+  /* Gem Color */
+  --color-gem: oklch(0.6 0.25 200);
+
+  /* Streak Color */
+  --color-streak: oklch(0.65 0.2 30);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  @theme inline {
+    --color-background: oklch(0.15 0.01 260);
+    --color-foreground: oklch(0.95 0 0);
+    --color-card: oklch(0.2 0.01 260);
+    --color-card-foreground: oklch(0.95 0 0);
+    --color-muted: oklch(0.25 0.01 260);
+    --color-muted-foreground: oklch(0.65 0.01 260);
+    --color-border: oklch(0.3 0.01 260);
+    --color-input: oklch(0.3 0.01 260);
+  }
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Smooth animations */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+}
+
+/* KaTeX overrides */
+.katex {
+  font-size: 1.1em;
+}
+
+.katex-display {
+  margin: 1em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
